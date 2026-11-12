@@ -7,6 +7,8 @@ the plan to open a search bar, type, and press Space or Enter to run:
   `tx` Text… every tool in the Toolbox that the API can activate (type `?` for the list).
 - **Views and sheets** from the Project Navigator, by name or number (`a101`, `gfc mas`).
 - **Layer combinations**.
+- **Archicad's own menu commands** by name, as your menu bar shows them (see
+  [Menu commands](#menu-commands); Archicad 29 only for now).
 
 Holding Space still works as Archicad's Magic Wand, and so does Space + click.
 The search bar follows Archicad's light or dark theme.
@@ -19,10 +21,37 @@ The search bar follows Archicad's light or dark theme.
 | Shift+Space | Type a space (multi-word searches) |
 | ↑ / ↓ / Tab | Move the selection |
 | Esc | Close |
+| Enter / click on the hint line | Open Options › Work Environment, when menu commands still need an export |
 | `?` | Cheatsheet of all chords |
 | `:settings` | Settings dialog (hold time, number of results, chords on/off) |
 
 Settings are saved in `%USERPROFILE%\.baaz\config.json`.
+
+## Menu commands
+
+Baaz can run the commands of Archicad's menu bar by their name. A result shows the menu it
+lives in, so similar names can be told apart. Pressing Enter does what clicking that menu
+item does; a command that is greyed out in the current window does not run, and the search
+bar says so the next time it opens.
+
+Archicad does not let an add-on read the names of its menu items, so Baaz takes them from
+an export of your work environment. Once:
+
+1. Open **Options › Work Environment** (Enter on the hint line in the search bar does this).
+2. Export the profile to `%USERPROFILE%\.baaz\commands`.
+3. Open the search bar again.
+
+Export again after you change your menus or add add-ons: the hint line counts the commands
+the export does not name yet. Baaz reads the exports in that folder and the work
+environment files under `%APPDATA%\GRAPHISOFT`; it writes to neither.
+
+A command is offered only when Baaz is sure which live menu item it belongs to. If a menu
+does not match the scheme, its commands are left out rather than guessed. The structure
+comes from the binary scheme file that Archicad keeps current; its format is not
+documented, and Baaz reads it only if it matches the layout seen in Archicad 29 exactly.
+
+This works in Archicad 29. The main window of Archicad 30 has no Win32 menu bar, so Baaz
+offers no menu commands there.
 
 ## Building
 
@@ -66,8 +95,11 @@ ctest --test-dir build -C Release --output-on-failure
 - `test_message_hook` drives the real Spacebar hook through a Win32 message queue,
   the way Archicad's event loop does (including `PM_NOREMOVE` peeks): taps, holds,
   Space + click, text fields, modal dialogs, app switching, and typing in the HUD.
+- `test_command_line_native`, `test_bin_scheme`, `test_live_menu` and `test_command_hint`
+  cover the menu commands: both scheme readers, linking names to menu positions, filling
+  and running a menu in a test window, and the hint texts.
 
-Neither needs Archicad or the DevKit.
+None of them needs Archicad or the DevKit.
 
 ## Layout
 

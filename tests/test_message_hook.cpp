@@ -5,10 +5,12 @@
 
 #include "MessageHook.hpp"
 #include "HudWindow.hpp"
+#include "CommandExecutor.hpp"
 #include "SearchEngine.hpp"
 #include "BaazAddon.hpp"
 #include <windows.h>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -16,11 +18,13 @@ using namespace Baaz;
 
 namespace Baaz {
 HINSTANCE AddonInstance() { return GetModuleHandleW(NULL); }
-HWND MainWindow() { return NULL; }
+HWND g_frame = NULL;
+HWND MainWindow() { return g_frame; }
 }
 
 static std::vector<INPUT> g_sent;
 static std::vector<MSG> g_delivered;
+static std::vector<unsigned> g_commands;
 static int g_failures = 0;
 static HWND g_main = NULL;
 static HWND g_edit = NULL;
@@ -48,6 +52,7 @@ static void Pump(bool peekFirst) {
         if (peekFirst && !PeekMessageW(&m, NULL, 0, 0, PM_NOREMOVE)) break;
         if (!PeekMessageW(&m, NULL, 0, 0, PM_REMOVE)) break;
         if (m.message == WM_KEYDOWN || m.message == WM_KEYUP) g_delivered.push_back(m);
+        if (m.message == WM_COMMAND && m.hwnd == g_main) g_commands.push_back(LOWORD(m.wParam));
         DispatchMessageW(&m);
     }
 }
@@ -112,6 +117,7 @@ static void Reset() {
     EnableWindow(g_main, TRUE);
     g_sent.clear();
     g_delivered.clear();
+    g_commands.clear();
 }
 
 static void Run(const char* name, void (*test)(bool), bool peekFirst) {
@@ -317,6 +323,172 @@ static void HudReopensAfterRunningCommand(bool peek) {
     CHECK(WandPresses() == 0);
 }
 
+// --- Hint row ----------------------------------------------------------------
+// Without a frame window the commands cannot be read, so the HUD shows the hint for that state.
+
+static const unsigned kWorkEnvironmentId = 7000;
+
+// A frame menu bar with one Work Environment command at {0, 0}, as BuildCommandIndex would find it
+struct WorkEnvironmentMenu {
+    HMENU bar = CreateMenu();
+    WorkEnvironmentMenu() {
+        HMENU popup = CreatePopupMenu();
+        AppendMenuW(popup, MF_STRING, kWorkEnvironmentId, L"Work Environment");
+        AppendMenuW(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(popup), L"Options");
+        SetMenu(g_main, bar);
+        g_frame = g_main;
+    }
+    ~WorkEnvironmentMenu() {
+        g_frame = NULL;
+        SetMenu(g_main, NULL);
+        DestroyMenu(bar);
+    }
+    WorkEnvironmentMenu(const WorkEnvironmentMenu&) = delete;
+    WorkEnvironmentMenu& operator=(const WorkEnvironmentMenu&) = delete;
+};
+
+static CommandIndex NoExportIndex() {
+    CommandIndex index;
+    index.state = CommandState::NoExport;
+    index.workEnvironment.kind = ItemKind::Command;
+    index.workEnvironment.title = L"Work Environment";
+    index.workEnvironment.menuPosition = { 0, 0 };
+    index.workEnvironment.liveId = kWorkEnvironmentId;
+    return index;
+}
+
+// The index refresh of a fresh HUD is pumped first, so it cannot replace what a test applies afterwards
+static void OpenHud(bool peek) {
+    Tap(VK_SPACE, peek);
+    Pump(peek);
+}
+
+static void HintIsNeverTheDefaultSelection(bool peek) {
+    OpenHud(peek);
+    CHECK(!HudWindow::GetHint().title.empty());
+    CHECK(!HudWindow::IsHintSelected());
+    Type(L"sl", peek);
+    CHECK(!HudWindow::IsHintSelected());
+    Tap(VK_RETURN, peek);
+    Pump(peek);
+    CHECK(!HudWindow::IsVisible());
+    CHECK(ExecutedChord() == L"SL");
+}
+
+static void UpReachesHintAndDownLeavesIt(bool peek) {
+    OpenHud(peek);
+    Tap(VK_DOWN, peek);
+    Tap(VK_UP, peek);
+    CHECK(!HudWindow::IsHintSelected());   // back on the first result, not on the hint
+    Tap(VK_UP, peek);
+    CHECK(HudWindow::IsHintSelected());
+    Tap(VK_UP, peek);
+    CHECK(HudWindow::IsHintSelected());
+    Tap(VK_DOWN, peek);
+    CHECK(!HudWindow::IsHintSelected());
+    Tap(VK_UP, peek);
+    Tap(VK_TAB, peek);
+    CHECK(!HudWindow::IsHintSelected());
+}
+
+static void EnterOnHintWithoutActionDoesNothing(bool peek) {
+    OpenHud(peek);
+    Tap(VK_UP, peek);
+    Tap(VK_RETURN, peek);
+    Pump(peek);
+    CHECK(HudWindow::IsVisible());
+    CHECK(HudWindow::IsHintSelected());
+    CHECK(ExecutedChord().empty());
+}
+
+static void EnterOnHintOpensWorkEnvironment(bool peek) {
+    OpenHud(peek);
+    WorkEnvironmentMenu menu;
+    HudWindow::ApplyCommandIndex(NoExportIndex());
+    CHECK(HudWindow::GetHint().canOpenWorkEnvironment);
+    Tap(VK_UP, peek);
+    Tap(VK_RETURN, peek);
+    Pump(peek);
+    CHECK(!HudWindow::IsVisible());
+    CHECK((g_commands == std::vector<unsigned>{ kWorkEnvironmentId }));
+}
+
+static void SpaceNeverRunsHint(bool peek) {
+    OpenHud(peek);
+    WorkEnvironmentMenu menu;
+    HudWindow::ApplyCommandIndex(NoExportIndex());
+    Type(L"sl", peek);
+    Tap(VK_UP, peek);
+    CHECK(HudWindow::IsHintSelected());
+    Tap(VK_SPACE, peek);
+    Pump(peek);
+    CHECK(HudWindow::IsVisible());
+    CHECK(HudWindow::GetQuery() == L"sl ");
+    CHECK(ExecutedChord().empty());
+    CHECK(g_commands.empty());
+}
+
+static BOOL CALLBACK FindHudOfThread(HWND window, LPARAM found) {
+    wchar_t name[64] = {};
+    if (GetClassNameW(window, name, static_cast<int>(std::size(name))) == 0 || wcscmp(name, L"BaazHUDWindowClass") != 0) return TRUE;
+    *reinterpret_cast<HWND*>(found) = window;
+    return FALSE;
+}
+
+// The HUD of this test only: an Archicad running Baaz on the same desktop has a window of the same class
+static HWND OwnHudWindow() {
+    HWND found = NULL;
+    EnumThreadWindows(GetCurrentThreadId(), FindHudOfThread, reinterpret_cast<LPARAM>(&found));
+    return found;
+}
+
+// 34 is the height of the search field in 96-DPI pixels; a few pixels below it is the hint row
+static void ClickHintRow() {
+    const float scale = GetDpiForWindow(g_main) / 96.0f;
+    const int y = static_cast<int>((34.0f + 5.0f) * scale);
+    HWND hud = OwnHudWindow();
+    CHECK(hud != NULL);
+    if (hud != NULL) SendMessageW(hud, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(100, y));
+}
+
+static void ClickOnHintOpensWorkEnvironment(bool peek) {
+    OpenHud(peek);
+    WorkEnvironmentMenu menu;
+    HudWindow::ApplyCommandIndex(NoExportIndex());
+    ClickHintRow();
+    Pump(peek);
+    CHECK(!HudWindow::IsVisible());
+    CHECK((g_commands == std::vector<unsigned>{ kWorkEnvironmentId }));
+}
+
+// A click that reaches the hidden window must not run what the HUD offered when it was last open
+static void ClickOnHiddenHudRunsNothing(bool peek) {
+    OpenHud(peek);
+    WorkEnvironmentMenu menu;
+    HudWindow::ApplyCommandIndex(NoExportIndex());
+    HudWindow::Hide();
+    ClickHintRow();
+    Pump(peek);
+    CHECK(!HudWindow::IsVisible());
+    CHECK(g_commands.empty());
+}
+
+static bool HintMentionsRefusedRun() {
+    const std::vector<std::wstring>& guide = HudWindow::GetHint().guide;
+    return !guide.empty() && guide.back().find(L"did not run") != std::wstring::npos;
+}
+
+static void RefusedRunIsShownOnce(bool peek) {
+    SearchItem item;
+    item.kind = ItemKind::Command;   // nothing to run in: no frame window
+    CHECK(!CommandExecutor::Execute(item));
+    OpenHud(peek);
+    CHECK(HintMentionsRefusedRun());
+    Tap(VK_ESCAPE, peek);
+    OpenHud(peek);
+    CHECK(!HintMentionsRefusedRun());
+}
+
 static void SwitchingAppsClosesHud(bool peek) {
     Tap(VK_SPACE, peek);
     CHECK(HudWindow::IsVisible());
@@ -379,6 +551,14 @@ int main() {
         Run("Space on empty query closes HUD", SpaceOnEmptyQueryCloses, peek);
         Run("Enter on empty query runs top result", EnterOnEmptyQueryRunsTopResult, peek);
         Run("HUD reopens after running a command", HudReopensAfterRunningCommand, peek);
+        Run("Hint is never the default selection", HintIsNeverTheDefaultSelection, peek);
+        Run("Up reaches the hint, Down leaves it", UpReachesHintAndDownLeavesIt, peek);
+        Run("Enter on a hint without action does nothing", EnterOnHintWithoutActionDoesNothing, peek);
+        Run("Enter on the hint opens Work Environment", EnterOnHintOpensWorkEnvironment, peek);
+        Run("Space never runs the hint", SpaceNeverRunsHint, peek);
+        Run("Click on the hint opens Work Environment", ClickOnHintOpensWorkEnvironment, peek);
+        Run("A click on the hidden HUD runs nothing", ClickOnHiddenHudRunsNothing, peek);
+        Run("A refused run is shown once", RefusedRunIsShownOnce, peek);
         Run("Switching apps closes HUD", SwitchingAppsClosesHud, peek);
         Run("Switching apps during hold sends nothing", SwitchingAppsDuringHoldSendsNothing, peek);
     }

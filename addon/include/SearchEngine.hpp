@@ -5,7 +5,7 @@
 
 namespace Baaz {
 
-enum class ItemKind { Tool, View, Sheet, LayerCombo, Setting, Help };
+enum class ItemKind { Tool, View, Sheet, LayerCombo, Setting, Help, Command };
 
 struct SearchItem {
     std::wstring title;
@@ -15,6 +15,9 @@ struct SearchItem {
     int toolType = 0;        // API_ElemTypeID and API_ElemVariationID of a tool
     int toolVariation = 0;
     double score = 0.0;
+    std::vector<int> menuPosition;  // Command: path through the live menu bar, including the item's own index
+    unsigned liveId = 0;            // Command: the id the live menu item had when it was linked
+    bool enabled = true;            // Command: false when the live item was greyed out
 };
 
 class SearchEngine {

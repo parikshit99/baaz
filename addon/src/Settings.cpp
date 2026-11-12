@@ -8,7 +8,7 @@ namespace Baaz {
 
 SettingsConfig Settings::s_config;
 
-static std::filesystem::path ConfigPath() {
+std::wstring Settings::FolderPath() {
     wchar_t* userProfile = nullptr;
     size_t len = 0;
     std::filesystem::path dir = L".";
@@ -16,7 +16,11 @@ static std::filesystem::path ConfigPath() {
         dir = userProfile;
         free(userProfile);
     }
-    return dir / L".baaz" / L"config.json";
+    return (dir / L".baaz").wstring();
+}
+
+static std::filesystem::path ConfigPath() {
+    return std::filesystem::path(Settings::FolderPath()) / L"config.json";
 }
 
 template <typename T>

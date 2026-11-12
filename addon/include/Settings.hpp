@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace Baaz {
 
@@ -24,6 +25,8 @@ public:
     static const SettingsConfig& Get() { return s_config; }
     // Out-of-range values keep their current setting; saves to disk
     static void Set(const SettingsConfig& config);
+    // %USERPROFILE%\.baaz, or .baaz in the current folder without a user profile
+    static std::wstring FolderPath();
 
 private:
     static void Save();

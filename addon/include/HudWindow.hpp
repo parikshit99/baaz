@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <string>
+#include "CommandHint.hpp"
 #include "SearchEngine.hpp"
 
 namespace Baaz {
@@ -19,13 +20,21 @@ public:
     static bool IsQueryEmpty() { return s_query.empty(); }
     static void HandleKey(WPARAM vk, WCHAR ch);
     static RECT GetBoundingRectScreen() { return s_rect; }
+    // What the command index says about missing commands; redraws the open HUD
+    static void ApplyCommandIndex(const CommandIndex& index);
+    static const HintRow& GetHint() { return s_hint; }
+    static bool IsHintSelected() { return s_hintSelected; }
 
 private:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     static void SetQuery(std::wstring query);
+    static void RebuildHint();
     static void Render();
     static void Reposition();
     static void ExecuteSelection();
+    static void ClickAt(float y);
+    static void MoveUp();
+    static bool LeaveHint();
 
     static HWND s_hWnd;
     static HWND s_hParentWnd;
@@ -34,6 +43,12 @@ private:
     static std::vector<SearchItem> s_results;
     static size_t s_selectedIndex;
     static SearchItem s_pendingItem;
+    static CommandState s_commandState;
+    static size_t s_notSearchable;
+    static SearchItem s_workEnvironment;
+    static bool s_runRefused;
+    static HintRow s_hint;
+    static bool s_hintSelected;
     static RECT s_rect;
     static float s_scale;
 };
