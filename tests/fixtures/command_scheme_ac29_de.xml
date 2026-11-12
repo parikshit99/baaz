@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Scheme xmlns="http://www.graphisoft.com/Development/WorkEnvironment/Scheme/2018/01">
+	<GlobalSettings>
+		<CommandLayout>
+			<!-- Trimmed command scheme; this comment must not change the result -->
+			<Menu ID="Menu6" title="Bildschirmdarstellungs-Optionen">
+				<Item command="10241-0x00000000-0x00000000" comment="Re&amp;inzeichnung"/>
+				<Item command="10242-0x00000000-0x00000000" comment="Wand- &amp;&amp; Träger-Referenzlinien"/>
+				<Item command="10243-0x00000000-0x00000000" comment="Dach-Aufsetzlinie"/>
+				<Item command="10261-0x00000000-0x00000000" comment="Treppen-Referenzlinien"/>
+				<Item command="10262-0x00000000-0x00000000" comment="Treppe berechnete Lauflinien"/>
+				<Item command="10263-0x00000000-0x00000000" comment="Geländer Referenzlinien"/>
+				<Item command="10249-0x00000000-0x00000000" comment="Echte Linienstärke"/>
+				<Item command="10256-0x00000000-0x00000000" comment="Dicke Schnittkanten"/>
+				<Item command="10250-0x00000000-0x00000000" comment="Echtes Schraffur-Erscheinungsbild"/>
+				<Item command="10252-0x00000000-0x00000000" comment="Marker-Reichweite"/>
+				<Item command="10257-0x00000000-0x00000000" comment="Quell-Marker hervorheben"/>
+				<Item command="10254-0x00000000-0x00000000" comment="Zeichnungsrahmen"/>
+				<Item command="10255-0x00000000-0x00000000" comment="Master-Elemente auf dem Layout"/>
+				<Item command="10260-0x00000000-0x00000000" comment="Bemaßungsreferenzlinie"/>
+				<Separator/>
+				<Item command="10244-0x00000000-0x00000000" comment="Zeichnungs- und Bearbeitungshilfen ein-/ausblenden"/>
+				<Item command="10245-0x00000000-0x00000000" comment="Schraffurbezugsvektoren"/>
+				<Item command="10246-0x00000000-0x00000000" comment="Textblock-Ecken"/>
+				<Item command="10247-0x00000000-0x00000000" comment="Bild-Ecken"/>
+				<Item command="10248-0x00000000-0x00000000" comment="Spline-Hebel"/>
+				<Separator/>
+				<Item command="10258-0x00000000-0x00000000" comment="Trimm-Körper"/>
+				<Separator/>
+				<Item command="10259-0x00000000-0x00000000" comment="Verborgene Morph-Geometrie anzeigen"/>
+			</Menu>
+			<Menu ID="Menu7" title="Modelldarstellung">
+				<Item command="1550-0x00000000-0x00000000" comment="Modelldarstellung erstellen..."/>
+				<Separator/>
+				<Item command="9472-0x00000000-0x00000000" comment="Keine Modelldarstellungs-Kombinationen"/>
+			</Menu>
+			<Menu ID="Menu37" title="Transparentpause wählen">
+				<Item command="21780-0x00000000-0x00000000" comment="Nach Transparentpause suchen..."/>
+				<Separator/>
+				<Item command="21768-0x00000000-0x00000000" comment="Letzte Transparentpausen"/>
+				<Separator/>
+				<Item command="21773-0x00000000-0x00000000" comment="Transparentpause - Wie zuletzt in der aktiven Zeichnung angezeigt"/>
+				<Separator/>
+				<Item command="21774-0x00000000-0x00000000" comment="Transparentpause - Eigenes Modell"/>
+				<Separator/>
+				<Item command="21775-0x00000000-0x00000000" comment="Transparentpause - Innenansichten"/>
+				<Separator/>
+				<Item command="21776-0x00000000-0x00000000" comment="Transparentpause - geschossbezogen"/>
+				<Separator/>
+				<Item command="21779-0x00000000-0x00000000" comment="Komplettes Modell darstellen"/>
+				<Separator/>
+				<Item command="21777-0x00000000-0x00000000" comment="Transparentpause - Quell-Ausschnitt"/>
+			</Menu>
+			<Menu ID="Menu40" iconID="24631" title="Projektion auf Bearbeitungsebene">
+				<Item command="16966-0x00000000-0x00000000" comment="Gesperrt zu Ebene"/>
+				<Separator/>
+				<Item command="1814-0x00000000-0x00000000" comment="Horizontal"/>
+				<Item command="1815-0x00000000-0x00000000" comment="Vertikal"/>
+				<Item command="1816-0x00000000-0x00000000" comment="Senkrecht zur Bearbeitungsebene"/>
+				<Item command="1817-0x00000000-0x00000000" comment="Senkrecht zur Folge-Ebene"/>
+			</Menu>
+			<MenuBar ID="MenuBar1" menubarguid="2085E4D3-5694-4BB9-ACAC-3AED5BE50091" name="Grundriss">
+				<Menu ID="Menu75" title="Ansicht">
+					<PopupItem>
+						<Menu IDREF="Menu6"/>
+					</PopupItem>
+					<Separator/>
+					<Item command="21761-0x00000000-0x00000000" comment="Transparentpause"/>
+					<Item command="1540-0x00000000-0x00000000" comment="Konstruktionsraster darstellen"/>
+					<Item command="1818-0x00000000-0x00000000" comment="Darstellung der Bearbeitungsebene"/>
+					<PopupItem>
+						<Menu ID="Menu76" title="Transparentpausen-Optionen">
+							<PopupItem>
+								<Menu IDREF="Menu37"/>
+							</PopupItem>
+							<Separator/>
+							<Item command="21766-0x00000000-0x00000000" comment="Transparentpause aktivieren"/>
+							<Item command="21769-0x00000000-0x00000000" comment="Transparentpause mit aktiver Zeichnung wechseln"/>
+							<Separator/>
+							<Item command="21762-0x00000000-0x00000000" comment="Transparentpause verschieben"/>
+							<Item command="21763-0x00000000-0x00000000" comment="Transparentpause drehen"/>
+							<Item command="21764-0x00000000-0x00000000" comment="Auf die Standardposition zurücksetzen"/>
+							<Item command="21765-0x00000000-0x00000000" comment="Transparentpause neu aufbauen"/>
+							<Separator/>
+							<Item command="21767-0x00000000-0x00000000" comment="Transparentpause temporär verschieben"/>
+							<Item command="21770-0x00000000-0x00000000" comment="Splitter anzeigen/verbergen"/>
+							<Item command="21772-0x00000000-0x00000000" comment="Transparentpause oben"/>
+							<Item command="21771-0x00000000-0x00000000" comment="Schraffuren und Raumflächen transparent"/>
+						</Menu>
+					</PopupItem>
+					<PopupItem>
+						<Menu ID="Menu77" title="Raster- &amp;&amp; Bearbeitungsebenen-Optionen">
+							<Item command="1538-0x00000000-0x00000000" comment="&amp;Raster-Einstellungen..."/>
+							<Separator/>
+							<Item command="18963-0x00000000-0x00000000" comment="Orthogonales Raster"/>
+							<Item command="18962-0x00000000-0x00000000" comment="Gedrehtes Raster"/>
+							<Separator/>
+							<Item command="18961-0x00000000-0x00000000" comment="Gedrehtes Raster einstellen"/>
+							<Separator/>
+							<Item command="1811-0x00000000-0x00000000" comment="Ebene aufnehmen"/>
+							<Item command="1821-0x00000000-0x00000000" comment="Nächste Ebene"/>
+							<Item command="1809-0x00000000-0x00000000" comment="Horizontal"/>
+							<Item command="1810-0x00000000-0x00000000" comment="Vertikal"/>
+							<Item command="1812-0x00000000-0x00000000" comment="Versatz"/>
+							<Item command="1822-0x00000000-0x00000000" comment="Geschoss fangen..."/>
+							<Item command="1813-0x00000000-0x00000000" comment="Zu letzten Bearbeitungsebene zurückkehren"/>
+							<Separator/>
+							<PopupItem>
+								<Menu IDREF="Menu40"/>
+							</PopupItem>
+							<Separator/>
+							<Item command="1808-0x00000000-0x00000000" comment="Blick senkrecht ausrichten"/>
+						</Menu>
+					</PopupItem>
+					<Item command="1830-0x00000000-0x00000000" comment="Anzeige Ursprung"/>
+					<Separator/>
+					<Item command="1557-0x00000000-0x00000000" comment="Lineal"/>
+					<Item command="7937-0x00000000-0x00000000" comment="Hilfslinien"/>
+					<PopupItem>
+						<Menu ID="Menu78" title="Hilfslinien-Optionen">
+							<Item command="7942-0x00000000-0x00000000" comment="Hilfslinien-Segment erstellen"/>
+							<Item command="7938-0x00000000-0x00000000" comment="Alle Hilfslinien löschen"/>
+							<Item command="7948-0x00000000-0x00000000" comment="Hilfslinien löschen"/>
+						</Menu>
+					</PopupItem>
+					<Separator/>
+					<Item command="1552-0x00000000-0x00000000" comment="&amp;Elementfang"/>
+				</Menu>
+				<Menu ID="Menu100" title="Dokumentation">
+					<PopupItem>
+						<Menu IDREF="Menu7"/>
+					</PopupItem>
+					<PopupItem>
+						<Menu ID="Menu102" title="Grafische Überschreibung">
+							<Item command="1564-0x00000000-0x00000000" comment="Grafische Überschreibungen..."/>
+							<Separator/>
+							<Item command="23040-0x00000000-0x00000000" comment="Keine grafischen Überschreibungen"/>
+							<Separator/>
+							<Item command="1563-0x00000000-0x00000000" comment="Grafische Überschreibungsregel..."/>
+						</Menu>
+					</PopupItem>
+					<Separator/>
+					<Item command="6407-0x00000000-0x00000000" comment="Grundriss-Schnittebene..."/>
+				</Menu>
+			</MenuBar>
+			<MenuBar ID="MenuBar2" menubarguid="2CAC215F-221C-420F-AAEB-8462A659B8D9" name="Text">
+				<Menu ID="Menu176" title="Text-Only">
+					<Item command="1025-0x00000000-0x00000000" comment="Wider&amp;rufen"/>
+				</Menu>
+			</MenuBar>
+		</CommandLayout>
+	</GlobalSettings>
+</Scheme>
