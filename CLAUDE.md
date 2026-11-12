@@ -20,6 +20,8 @@ Every change must follow the rules in [REVIEW.md](REVIEW.md). They are imported 
 | `addon/src/SearchEngine.cpp` | Tool table, chords, ranking and the `?` cheatsheet. |
 | `addon/src/NavigatorIndexer.cpp` | Views, layouts and layer combinations of the open project. |
 | `addon/src/CommandExecutor.cpp` | Runs a result: tool, view, layout, layer combination, settings. |
+| `addon/src/SchemeReader.cpp` | Reads an exported command-layout scheme (XML) into a menu tree; no Archicad API. |
+| `addon/src/BinSchemeReader.cpp` | Reads the binary command scheme Archicad keeps current (`.bin`) into a menu tree; no Archicad API. |
 | `addon/src/Settings.cpp`, `SettingsDialog.cpp` | `%USERPROFILE%\.baaz\config.json` and its dialog. |
 | `addon/resources/` | `RINT/AddOn.grc` (name), `RFIX/AddOnFix.grc` (MDID), `RFIX.win/AddOnMain.rc2`. |
 | `tests/` | Native tests, built without the Archicad API. `test_sendinput_stub.hpp` records synthesized keys. |
